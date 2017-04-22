@@ -2469,8 +2469,6 @@ static void ScanAndLoadShaderFiles()
 		hashMem += (shaderTextHashTableSizes[i] + 1);
 	}
 
-	Com_Memset( shaderTextHashTableSizes, 0, sizeof(shaderTextHashTableSizes) );
-
 	p = s_shaderText;
 	while (p < s) {
 		char* oldp = p;
@@ -2478,7 +2476,7 @@ static void ScanAndLoadShaderFiles()
 		if ( token[0] == 0 )
 			break;
 		hash = Q_FileHash( token, MAX_SHADERTEXT_HASH );
-		shaderTextHashTable[hash][shaderTextHashTableSizes[hash]++] = oldp;
+		shaderTextHashTable[hash][--shaderTextHashTableSizes[hash]] = oldp;
 		SkipBracedSection( (const char**)&p );
 	}
 }
