@@ -182,7 +182,8 @@ typedef enum {
 	CG_EXT_GETVALUE = 700,
 	CG_EXT_LOCATEINTEROPDATA,
 	CG_EXT_R_ADDREFENTITYTOSCENE2,
-	CG_EXT_R_FORCEFIXEDDLIGHTS
+	CG_EXT_R_FORCEFIXEDDLIGHTS,
+	CG_EXT_CMD_SETCOMPLETION
 } cgameImport_t;
 
 
@@ -414,7 +415,9 @@ typedef enum {
 
 	CG_MOUSE_EVENT,
 //	void	(*CG_MouseEvent)( int dx, int dy );
-	CG_EVENT_HANDLING
+	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
+
+	CG_COUNT
 } cgameExport_t;
 

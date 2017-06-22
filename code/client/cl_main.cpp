@@ -1890,19 +1890,6 @@ qbool CL_CDKeyValidate( const char *key, const char *checksum )
 }
 
 
-static void CL_CallVote_f()
-{
-	CL_ForwardCommandToServer( Cmd_Cmd() );
-}
-
-
-static void CL_CompleteCallVote_f( int startArg, int compArg )
-{
-	if ( compArg == startArg + 2 && !Q_stricmp( Cmd_Argv( startArg + 1 ), "map" ) )
-		Field_AutoCompleteMapName( startArg, compArg );
-}
-
-
 void CL_Init()
 {
 	//QSUBSYSTEM_INIT_START( "Client" );
@@ -1987,12 +1974,6 @@ void CL_Init()
 	Cmd_AddCommand ("model", CL_SetModel_f );
 	Cmd_AddCommand ("video", CL_Video_f );
 	Cmd_AddCommand ("stopvideo", CL_StopVideo_f );
-
-	// we use these until we get proper handling on the mod side
-	Cmd_AddCommand ("cv", CL_CallVote_f );
-	Cmd_AddCommand ("callvote", CL_CallVote_f );
-	Cmd_SetAutoCompletion ("cv", CL_CompleteCallVote_f );
-	Cmd_SetAutoCompletion ("callvote", CL_CompleteCallVote_f );
 
 	CL_InitRef();
 

@@ -300,22 +300,44 @@ void CL_ShutdownCGame()
 
 static qbool CL_CG_GetValue( char* value, int valueSize, const char* key )
 {
-	if( Q_stricmp(key, "trap_LocateInteropData") == 0 ) {
+	if ( Q_stricmp(key, "trap_LocateInteropData") == 0 ) {
 		Com_sprintf( value, valueSize, "%d", CG_EXT_LOCATEINTEROPDATA );
 		return qtrue;
 	}
 
-	if( Q_stricmp(key, "trap_R_AddRefEntityToScene2") == 0 ) {
+	if ( Q_stricmp(key, "trap_R_AddRefEntityToScene2") == 0 ) {
 		Com_sprintf( value, valueSize, "%d", CG_EXT_R_ADDREFENTITYTOSCENE2 );
 		return qtrue;
 	}
 
-	if( Q_stricmp(key, "trap_R_ForceFixedDLights") == 0 ) {
+	if ( Q_stricmp(key, "trap_R_ForceFixedDLights") == 0 ) {
 		Com_sprintf( value, valueSize, "%d", CG_EXT_R_FORCEFIXEDDLIGHTS );
 		return qtrue;
 	}
 
+	if ( Q_stricmp(key, "trap_AddCommandCompletion") == 0 ) {
+		Com_sprintf( value, valueSize, "%d", CG_EXT_CMD_SETCOMPLETION );
+		return qtrue;
+	}
+
 	return qfalse;
+}
+
+
+void CL_CG_AutoComplete( int callId, int cmdId, int startArg, int compArg )
+{
+	field_t* const field = Field_GetCompletionField();
+	if ( field == NULL )
+		return;
+
+	const int result = (int)VM_Call( cgvm, callId, cmdId, startArg, compArg, field->cursor );
+	if ( result == 1 ) {
+		field->cursor = *(int*)interopBufferOut;
+		Q_strncpyz( field->buffer, (char*)(interopBufferOut + 4), sizeof(field->buffer) );
+	} else if ( result == 2 )
+		Field_AutoCompleteStringList( startArg, compArg, (const char*)(interopBufferOut + 4), *(int*)interopBufferOut );
+	else if ( result == 3 )
+		Field_AutoCompleteMapName( startArg, compArg );
 }
 
 
@@ -587,6 +609,10 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 
 	case CG_EXT_R_FORCEFIXEDDLIGHTS:
 		return 0; // already the case for CNQ3
+
+	case CG_EXT_CMD_SETCOMPLETION:
+		Cmd_SetCGameAutoCompletion( VMA(1), args[2], args[3] );
+		return 0;
 
 	default:
 		Com_Error( ERR_DROP, "Bad cgame system trap: %i", args[0] );

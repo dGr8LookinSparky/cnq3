@@ -230,6 +230,9 @@ typedef struct cmd_function_s
 	char					*name;
 	xcommand_t				function;
 	xcommandCompletion_t	completion;
+	qbool					cgame;
+	int						cgCallId;
+	int						cgCmdId;
 } cmd_function_t;
 
 
@@ -509,6 +512,25 @@ void Cmd_SetAutoCompletion( const char* cmd_name, xcommandCompletion_t completio
 }
 
 
+void Cmd_SetCGameAutoCompletion( const char* cmd_name, int vmcallId, int commandId )
+{
+	cmd_function_t* cmd;
+	for ( cmd = cmd_functions; cmd; cmd = cmd->next ) {
+		if ( !strcmp( cmd_name, cmd->name ) ) {
+			cmd->cgame = qtrue;
+			cmd->cgCallId = vmcallId;
+			cmd->cgCmdId = commandId;
+			return;
+		}
+	}
+}
+
+
+#ifndef DEDICATED
+void CL_CG_AutoComplete( int callId, int cmdId, int startArg, int compArg );
+#endif
+
+
 void Cmd_AutoCompleteArgument( const char* cmd_name, int startArg, int compArg )
 {
 	const cmd_function_t* cmd;
@@ -516,6 +538,10 @@ void Cmd_AutoCompleteArgument( const char* cmd_name, int startArg, int compArg )
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			if ( cmd->completion )
 				cmd->completion( startArg, compArg );
+#ifndef DEDICATED
+			else if ( cmd->cgame )
+				CL_CG_AutoComplete( cmd->cgCallId, cmd->cgCmdId, startArg, compArg );
+#endif
 			return;
 		}
 	}

@@ -356,6 +356,7 @@ void Cmd_RemoveCommand( const char* cmd_name );
 
 // auto-completion of command arguments
 void Cmd_SetAutoCompletion( const char* cmd_name, xcommandCompletion_t complete );
+void Cmd_SetCGameAutoCompletion( const char* cmd_name, int vmcallId, int commandId );
 void Cmd_AutoCompleteArgument( const char* cmd_name, int startArg, int compArg );
 
 // auto-completion of the command's name
@@ -657,6 +658,7 @@ typedef struct {
 
 void Field_Clear( field_t *edit );
 void Field_AutoComplete( field_t *edit, qbool insertBackslash ); // should only be called by Console_Key
+field_t* Field_GetCompletionField();
 
 // these are the functions you can use from your own command argument auto-completion callbacks
 void Field_AutoCompleteFrom( int startArg, int compArg, qbool searchCmds, qbool searchVars );
@@ -665,6 +667,7 @@ void Field_AutoCompleteConfigName( int startArg, int compArg );
 void Field_AutoCompleteDemoNameRead( int startArg, int compArg );
 void Field_AutoCompleteDemoNameWrite( int startArg, int compArg );
 void Field_AutoCompleteKeyName( int startArg, int compArg );
+void Field_AutoCompleteStringList( int startArg, int compArg, const char* stringBuffer, int stringCount );
 
 #define COMMAND_HISTORY		32
 typedef struct {

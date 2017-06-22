@@ -2874,6 +2874,12 @@ void Field_AutoComplete( field_t *field, qbool insertBackslash )
 }
 
 
+field_t* Field_GetCompletionField()
+{
+	return completionField;
+}
+
+
 void Field_AutoCompleteMapName( int startArg, int compArg )
 {
 	FS_FilenameCompletion( "maps", "bsp", qtrue, FindMatches, 0 );
@@ -2928,6 +2934,24 @@ void Field_AutoCompleteKeyName( int startArg, int compArg )
 }
 
 #endif
+
+
+static void StringList_Completion( const char* stringBuffer, int stringCount, void (*callback)(const char *s) )
+{
+	for ( int i = 0; i < stringCount; i++ ) {
+		(*callback)(stringBuffer);
+		const int length = (int)strlen( stringBuffer );
+		stringBuffer += length + 1;
+	}
+}
+
+
+void Field_AutoCompleteStringList( int startArg, int compArg, const char* stringBuffer, int stringCount )
+{
+	StringList_Completion( stringBuffer, stringCount, FindMatches );
+	if ( Field_CompleteShortestMatch( startArg, compArg ) )
+		StringList_Completion( stringBuffer, stringCount, PrintMatches );
+}
 
 
 void History_Clear( history_t* history, int width )
